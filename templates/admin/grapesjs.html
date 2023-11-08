@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grapes JS Example</title>
+
+    <link rel="stylesheet" href="//unpkg.com/grapesjs/dist/css/grapes.min.css">
+    <script src="//unpkg.com/grapesjs"></script>
+    
+    <script src="{% static 'js/lib/grapes.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/lib/grapes.min.css' %}" />
+
+    <!-- Add Style and Script for Preset Webpage Builder -->
+    <script src="{% static 'js/lib/grapesjs-preset-webpage.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/lib/grapesjs-preset-webpage.min.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    
+</head>
+
+<body>
+    <form onsubmit="saveContent(event)" style="display: none;">
+        {% csrf_token %}
+        <button class="py-2 px-6 rounded text-white btn bg-blue-500 hover:bg-blue-600 mr-4" type="submit">Lưu</button>
+    </form>
+    <div id="editor">
+        <style >
+                {{ page.css }}
+        </style>
+         {{ page.html | safe }}
+        
+    </div>
+
+    <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+    <script type="text/javascript">
+        editor.Panels.addButton('options', {
+            id: 'save-db',
+            className: 'fa fa-floppy-o',
+            command: (editor, sender) => {
+                sender && sender.set('active'); // turn off the button
+                editor.store()
+            },
+            attributes: {
+                title: 'Save DB',
+                id: 'save-button' // Gán một ID cho nút "Save"
+            }
+        });
+
+        const id = "{{ page.id }}";
+        
+        // Bắt sự kiện click cho nút "Save"
+        document.getElementById('save-button').addEventListener('click', function (e) {
+            e.preventDefault(); // Ngăn chặn hành vi mặc định của nút
+            saveContent(e); // Gọi hàm saveContent
+        });
+
+        // Định nghĩa hàm saveContent (giả sử rằng bạn đã định nghĩa biến "editor" trước đó)
+        function saveContent(e) {
+            e.preventDefault()
+            console.log(editor.getHtml(), editor.getCss());
+            const slug = "{{ page.slug }}"
+            const formData = new FormData()
+            formData.append('html', editor.getHtml());
+            formData.append('css', editor.getCss());
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const url = slug ? `/editPage/${slug}` : 'page/create';
+            const request = new Request(
+                url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    mode: 'same-origin', // Do not send CSRF token to another domain.
+                    body: formData
+                }
+            );
+            fetch(request).then((resp) => resp.json()).then((response) => {
+                console.log(response)
+                alert('page saved successfully')
+            }).catch((error) => {
+                console.log(error)
+                alert('Error')
+            })
+        }
+    
+    
+    </script>
+</body>
+
+</html>

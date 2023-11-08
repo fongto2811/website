@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTERIOR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{% static 'js/lib/grapes.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/lib/grapes.min.css' %}" />
+
+    <!-- Add Style and Script for Preset Webpage Builder -->
+    <script src="{% static 'js/lib/grapesjs-preset-webpage.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/lib/grapesjs-preset-webpage.min.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+
+    <link rel="stylesheet" href="//unpkg.com/grapesjs/dist/css/grapes.min.css">
+    <script src="//unpkg.com/grapesjs"></script>
+    <style>
+        {% if page %}
+            {{ page.css | safe }}
+        {% endif %}
+    </style>
+</head>
+<body>
+    {% if page %}
+        {{page.html | safe }}
+    {% endif %}
+</body>
+</html>
